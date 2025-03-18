@@ -259,3 +259,35 @@ function notifyUser(message) {
   }, 3000);
 }
 notifyUser("Quotes synced successfully!");
+async function syncQuotes() {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    if (!response.ok) {
+      throw new Error("Failed to fetch quotes from the server.");
+    }
+
+    const serverQuotes = await response.json();
+
+    // Map server data to quote format
+    const mappedQuotes = serverQuotes.map(post => ({
+      text: post.title,
+      category: "Server",
+    }));
+
+    // Merge server quotes with local quotes
+    const mergedQuotes = [...mappedQuotes, ...quotes];
+    quotes = Array.from(new Set(mergedQuotes.map(q => JSON.stringify(q)))).map(q =>
+      JSON.parse(q)
+    );
+
+    // Save the updated quotes to local storage
+    saveQuotes();
+
+    // Show notification with the required message
+    alert("Quotes synced with server!");
+  } catch (error) {
+    console.error(error.message);
+    alert("Error syncing quotes with the server.");
+  }
+}
+setInterval(syncQuotes, 60000); // Sync every 60 seconds
