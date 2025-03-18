@@ -118,3 +118,49 @@ function populateCategories() {
   }
   }
   setInterval(fetchQuotesFromServer, 60000);
+  function createAddQuoteForm() {
+    // Create form elements
+    const formDiv = document.createElement("div");
+    const quoteInput = document.createElement("input");
+    const categoryInput = document.createElement("input");
+    const addButton = document.createElement("button");
+  
+    // Set attributes and placeholders
+    quoteInput.setAttribute("id", "newQuoteText");
+    quoteInput.setAttribute("type", "text");
+    quoteInput.setAttribute("placeholder", "Enter a new quote");
+  
+    categoryInput.setAttribute("id", "newQuoteCategory");
+    categoryInput.setAttribute("type", "text");
+    categoryInput.setAttribute("placeholder", "Enter quote category");
+    addButton.textContent = "Add Quote";
+    addButton.onclick = addQuote;
+    formDiv.appendChild(quoteInput);
+    formDiv.appendChild(categoryInput);
+    formDiv.appendChild(addButton);
+    document.body.appendChild(formDiv);
+  }function createAddQuoteForm() {
+    const formDiv = document.createElement("div");
+    formDiv.setAttribute("id", "addQuoteForm");
+    const quoteInput = document.createE
+  window.onload = function() {
+    loadQuotes();
+    populateCategories();
+    createAddQuoteForm(); // Ensure the form is added dynamically
+  };
+  function addQuote() {
+    const text = document.getElementById("newQuoteText").value;
+    const category = document.getElementById("newQuoteCategory").value;
+    if (text && category) {
+      quotes.push({ text, category });
+      saveQuotes();
+      populateCategories()
+      document.getElementById("newQuoteText").value = '';
+      document.getElementById("newQuoteCategory").value = '';
+      alert("Quote added successfully!");
+    } else {
+      alert("Please fill out both fields.");
+    }
+  }
+document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+    
