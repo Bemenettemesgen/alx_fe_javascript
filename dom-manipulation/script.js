@@ -163,4 +163,99 @@ function populateCategories() {
     }
   }
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
-    
+    // Function to post a new quote to the server
+async function postQuoteToServer(quote) {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(quote),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to post the quote to the server.");
+    }
+
+    const responseData = await response.json();
+    console.log("Quote posted successfully:", responseData);
+    alert("Quote successfully posted to the server!");
+  } catch (error) {
+    console.error(error.message);
+    alert("Error posting quote to the server.");
+  }
+}
+
+// Update the addQuote function to post new quotes to the server
+function addQuote() {
+  const text = document.getElementById("newQuoteText").value;
+  const category = document.getElementById("newQuoteCategory").value;
+
+  if (text && category) {
+    const newQuote = { text, category };
+
+    // Add the quote locally
+    quotes.push(newQuote);
+    saveQuotes();
+    populateCategories();
+
+    // Post the quote to the server
+    postQuoteToServer(newQuote);
+
+    // Clear input fields
+    document.getElementById("newQuoteText").value = '';
+    document.getElementById("newQuoteCategory").value = '';
+    alert("Quote added successfully!");
+  } else {
+    alert("Please fill out both fields.");
+  }
+}
+async function syncQuotes() {
+  try {
+    const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+    if (!response.ok) {
+      throw new Error("Failed to fetch quotes from the server.");
+    }
+
+    const serverQuotes = await response.json();
+
+    // Map server data to the quote format
+    const mappedQuotes = serverQuotes.map(post => ({
+      text: post.title,
+      category: "Server",
+    }));
+
+    // Merge server quotes with local quotes
+    const mergedQuotes = [...mappedQuotes, ...quotes];
+    quotes = Array.from(new Set(mergedQuotes.map(q => JSON.stringify(q)))).map(q =>
+      JSON.parse(q)
+    );
+
+    saveQuotes();
+    alert("Quotes successfully synced with the server!");
+  } catch (error) {
+    console.error(error.message);
+    alert("Error syncing quotes with the server.");
+  }
+}
+// Periodically fetch new quotes from the server every 60 seconds
+setInterval(syncQuotes, 60000);
+function notifyUser(message) {
+  const notification = document.createElement("div");
+  notification.textContent = message;
+  notification.style.position = "fixed";
+  notification.style.bottom = "10px";
+  notification.style.right = "10px";
+  notification.style.backgroundColor = "green";
+  notification.style.color = "white";
+  notification.style.padding = "10px";
+  notification.style.borderRadius = "5px";
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+notifyUser("Quotes synced successfully!");
